@@ -1,0 +1,72 @@
+pipeline {
+    agent any
+    
+    environment{
+        name = "sammek"
+    }
+    
+    parameters{
+        string(name: 'person', defaultValue: 'Sammek gandhi', description: 'Who are you?')
+        booleanParam(name: 'IsMale', defaultValue: 'True', description: '')
+        choice(name: 'City', choices: ['Pune','Mumbai','Delhi'], description: '')
+    }
+
+    stages {
+        stage('Run Command') {
+            steps {
+                bat '''
+                dir
+                ipconfig
+                path
+                '''
+            }
+        }
+        stage('Environmental variables') {
+            steps {
+                bat 'echo %BUILD_ID%'
+                bat 'echo %name%'
+            }
+        }
+        stage('environment in stage') {
+            environment{
+                address = 'Nigdi, Pune'
+            }
+            steps {
+                echo 'Hello This Is Prod Stage'
+                bat 'echo %address%'
+            }
+        }
+        stage('Parameters') {
+            steps {
+                bat 'echo %person%'
+                bat 'echo %IsMale%'
+                bat 'echo %City%'
+            }
+        }
+        stage('Continue ?') {
+            input{
+                message "Should we continue?"
+                ok "Yes we should"
+            }
+            steps {
+                echo "This is Input From User"
+            }
+        }
+        stage('Production') {
+            steps {
+                echo "This is Prod"
+            }
+        }
+    }
+    post{
+        always{
+            echo "It will alway say Hello Again!!!!!"
+        }
+        failure{
+            echo "Failure"
+        }
+        success{
+            echo "Success"
+        }
+    }
+}
