@@ -6,6 +6,7 @@ pipeline{
             steps{
                 //mvn test
                 sh mvn test
+                slackSend channel: 'jenkinsdemo', message: 'job started'
             }
         }
         stage("Build"){
@@ -20,6 +21,10 @@ pipeline{
             }
         }   
         stage("deploy on prod"){
+            input{
+                message "Should we continue?"
+                ok "Yes we should"
+            }
             steps{
                 // deploy on container -> plugin
                 deploy adapters:[tomcat9(credentialsId: 'tomcatserverdetails1', path:'', url: 'http://192.168.0.119:8080')], contextPath: '/app', war: '**/*.war'
@@ -32,9 +37,11 @@ pipeline{
         }
         success{
             echo "========pipeline executed successfully ========"
+            slackSend channel: 'jenkinsdemo', message: 'job success'
         }
         failure{
             echo "========pipeline execution failed========"
+            slackSend channel: 'jenkinsdemo', message: 'job fail'
         }
     }
 }
